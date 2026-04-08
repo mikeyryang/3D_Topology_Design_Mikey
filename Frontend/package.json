@@ -1,0 +1,30 @@
+{
+  "name": "topoforge-frontend",
+  "version": "1.0.0",
+  "description": "TopoForge — Interactive 3D Topology Optimization Web App",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "three": "^0.163.0",
+    "@react-three/fiber": "^8.16.0",
+    "@react-three/drei": "^9.105.0",
+    "recharts": "^2.12.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version"]
+  }
+}

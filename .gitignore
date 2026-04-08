@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+*.log
+convergence_final.png
+density_histogram_final.png
+optimized_design_threshold_0.1.png
+optimized_design_threshold_0.3.png
+optimized_design_threshold_0.5.png
