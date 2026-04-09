@@ -337,6 +337,92 @@ async def websocket_optimize(websocket: WebSocket, job_id: str):
 
 
 # ─────────────────────────────────────────────
+# AI Analysis Endpoint (BYOK — Bring Your Own Key)
+# ─────────────────────────────────────────────
+
+class AnalysisRequest(BaseModel):
+    preset: str
+    compliance: float
+    volume: float
+    improvement: float
+    solid_pct: float
+    transition_pct: float
+    void_pct: float
+    total_elements: int
+    iterations_run: int
+    api_key: str  # User provides their own Anthropic key
+
+
+@app.post("/api/analyze")
+async def analyze_results(data: AnalysisRequest):
+    """
+    AI-powered results analysis using the user's own Anthropic API key.
+    The key is used once per request and never stored anywhere.
+    """
+
+    # Validate key format before hitting the API
+    if not data.api_key.startswith("sk-ant-"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid API key format. Anthropic keys start with 'sk-ant-'"
+        )
+
+    try:
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=data.api_key)
+
+        prompt = f"""You are an expert structural engineer analyzing 3D topology optimization results.
+
+A {data.preset.replace('_', ' ')} structure was just optimized with these results:
+- Final compliance (stiffness measure): {data.compliance:.4e} (lower = stiffer)
+- Volume fraction used: {data.volume * 100:.1f}% of available space
+- Stiffness improvement over uniform solid: {data.improvement:.1f}%
+- Solid elements (density > 0.9): {data.solid_pct:.1f}%
+- Transition elements (0.3–0.9): {data.transition_pct:.1f}%
+- Void elements (density < 0.3): {data.void_pct:.1f}%
+- Total elements in mesh: {data.total_elements}
+- Iterations completed: {data.iterations_run}
+
+Write a concise 3-part analysis:
+
+**What the optimizer discovered**
+One paragraph explaining what structural form emerged and why it makes physical sense. Reference real-world analogues (I-beams, trusses, arches etc.) where relevant.
+
+**What the numbers mean**
+One paragraph translating the metrics into plain English. What does {data.improvement:.1f}% improvement actually mean for a real engineer?
+
+**Actionable next steps**
+Exactly 3 bullet points with specific parameter changes the user could make to improve the result further. Be concrete — mention actual values (e.g. "increase penalty from 3.0 to 4.0").
+
+Keep the total response under 350 words. Be direct and insightful, avoid filler phrases."""
+
+        message = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=600,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        return {"analysis": message.content[0].text}
+
+    except anthropic.AuthenticationError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid API key — please check your Anthropic key and try again."
+        )
+    except anthropic.RateLimitError:
+        raise HTTPException(
+            status_code=429,
+            detail="API rate limit reached on your key. Please wait a moment and try again."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analysis failed: {str(e)}"
+        )
+
+
+# ─────────────────────────────────────────────
 # Run with: uvicorn main:app --reload --port 8000
 # ─────────────────────────────────────────────
 if __name__ == "__main__":

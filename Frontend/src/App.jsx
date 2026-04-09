@@ -2,6 +2,7 @@ import { useState } from "react";
 import WizardMode from "./components/WizardMode";
 import MeshViewer from "./components/MeshViewer";
 import ResultsViewer from "./components/ResultsViewer";
+import LandingPage from "./components/LandingPage";
 
 const globalStyle = `
   :root {
@@ -146,35 +147,5 @@ export default function App() {
         </main>
       </div>
     </>
-  );
-}
-
-function LandingPage({ onStart }) {
-  return (
-    <div style={S.landing}>
-      <p style={S.eyebrow}>3D Structural Optimization</p>
-      <h1 style={S.h1}>TOPO<span style={S.accent}>FORGE</span></h1>
-      <p style={S.subtitle}>
-        Design material-efficient 3D structures using SIMP topology optimization. No code required.
-      </p>
-      <div style={S.pillRow}>
-        {["⬡ Live 3D Viewer","⚡ Real-time Optimization","🎯 Guided Wizard","📐 SIMP Algorithm"]
-          .map(f => <span key={f} style={S.pill}>{f}</span>)}
-      </div>
-      <button style={S.ctaBtn} onClick={onStart}>Start Designing →</button>
-      <div style={S.presetRow}>
-        {[
-          { icon:"▬", name:"Cantilever Beam",  desc:"Fixed + tip load" },
-          { icon:"⌒", name:"Bridge Structure", desc:"Dual support + load" },
-          { icon:"✛", name:"Drone Arm",        desc:"Lightweight tip load" },
-        ].map(p => (
-          <div key={p.name} style={S.presetCard} onClick={onStart}>
-            <div style={S.pIcon}>{p.icon}</div>
-            <div style={S.pName}>{p.name}</div>
-            <div style={S.pDesc}>{p.desc}</div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
