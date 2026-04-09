@@ -5,3 +5,4 @@ numpy>=2.0.0
 pydantic>=2.9.0
 python-multipart>=0.0.9
 anthropic>=0.20.0
+scipy>=1.11.0
