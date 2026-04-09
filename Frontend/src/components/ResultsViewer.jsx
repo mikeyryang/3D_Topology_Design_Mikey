@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { API_BASE } from "../config";
 
 const AI_CSS = `
   .ai-panel { transition: all 0.3s ease; }
@@ -194,7 +195,7 @@ function AIAnalysisPanel({ results, improvement, solid, medium, void_, total }) 
     setLoading(true); setError(null); setAnalysis(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/analyze", {
+      const res = await fetch(`${API_BASE}/api/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

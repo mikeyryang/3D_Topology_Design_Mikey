@@ -3,6 +3,7 @@ import WizardMode from "./components/WizardMode";
 import MeshViewer from "./components/MeshViewer";
 import ResultsViewer from "./components/ResultsViewer";
 import LandingPage from "./components/LandingPage";
+import { API_BASE } from "./config";
 
 const globalStyle = `
   :root {
@@ -80,7 +81,7 @@ export default function App() {
   const handleStartOptimization = async (cfg) => {
     setConfig(cfg);
     try {
-      const res  = await fetch("http://localhost:8000/api/jobs", { method: "POST" });
+      const res = await fetch(`${API_BASE}/api/jobs`, { method: "POST" });
       const data = await res.json();
       setJobId(data.job_id);
       setPage("optimizing");

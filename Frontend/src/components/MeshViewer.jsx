@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { WS_BASE } from "../config";
 
 const S = {
   container: {
@@ -153,7 +154,7 @@ export default function MeshViewer({ jobId, config, onMeshLoaded, onComplete }) 
   useEffect(() => {
     if (!jobId || !config || !sceneRef.current) return;
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/optimize/${jobId}`);
+    const ws = new WebSocket(`${WS_BASE}/ws/optimize/${jobId}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
