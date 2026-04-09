@@ -8,43 +8,26 @@ from itertools import product as iproduct
 
 
 class DensityFilter:
-    """Density filter to prevent checkerboard patterns."""
+    """Density filter to prevent checkerboard patterns — vectorized."""
 
     def __init__(self, nodes, elems, radius=1.5):
-        """Initialize filter with connectivity information."""
         self.nodes = nodes
         self.elems = elems
         self.radius = radius
         self.n_elem = len(elems)
-
-        # Precompute element centers
         self.elem_centers = np.mean(nodes[elems], axis=1)
-
-        # Precompute weight matrix
         self._compute_weights()
 
     def _compute_weights(self):
-        """Precompute filter weights."""
-        self.H = np.zeros((self.n_elem, self.n_elem))
-        self.H_sum = np.zeros(self.n_elem)
-
-        for i in range(self.n_elem):
-            for j in range(self.n_elem):
-                dist = np.linalg.norm(self.elem_centers[i] - self.elem_centers[j])
-                if dist < self.radius:
-                    weight = self.radius - dist
-                    self.H[i, j] = weight
-                    self.H_sum[i] += weight
+        centers = self.elem_centers
+        diff = centers[:, np.newaxis, :] - centers[np.newaxis, :, :]
+        dist = np.sqrt(np.sum(diff**2, axis=-1))
+        self.H = np.maximum(self.radius - dist, 0)
+        self.H_sum = self.H.sum(axis=1)
+        self.H_sum = np.where(self.H_sum == 0, 1, self.H_sum)
 
     def apply(self, density):
-        """Apply density filter."""
-        filtered = np.zeros_like(density)
-        for i in range(self.n_elem):
-            if self.H_sum[i] > 0:
-                filtered[i] = np.sum(self.H[i, :] * density) / self.H_sum[i]
-            else:
-                filtered[i] = density[i]
-        return filtered
+        return (self.H @ density) / self.H_sum
 
 
 class SIMPOptimizer:
